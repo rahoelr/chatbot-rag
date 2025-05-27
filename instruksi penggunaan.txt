@@ -1,0 +1,121 @@
+============================================
+INSTRUCTION GUIDE FOR LANGCHAIN RAG CHATBOT API
+============================================
+
+1. .env - Configuration File
+----------------------------
+Purpose: Stores sensitive environment variables
+
+Contents:
+DB_HOST=localhost         # PostgreSQL host
+DB_NAME=chatbot_db       # Database name
+DB_USER=postgres         # Database username
+DB_PASSWORD=yourpassword # Database password
+DB_PORT=5432             # Database port
+OPENAI_API_KEY=sk-...    # OpenAI API key
+
+Usage:
+- Replace values with your actual credentials
+- Never commit this file to public repositories
+- Requires OpenAI API key from platform.openai.com
+
+2. database.py - PostgreSQL Connection
+-------------------------------------
+Purpose: Handles database connections and fetches documents
+
+Key Functions:
+- get_db_connection(): Establishes PostgreSQL connection
+- fetch_documents(): Retrieves documents for knowledge base
+
+Usage:
+- Ensure PostgreSQL is running with correct table structure
+- Modify the SQL query in fetch_documents() as needed
+- Table should contain at least: id, title, content, metadata
+
+3. rag.py - RAG Core System
+--------------------------
+Purpose: Implements RAG pipeline using LangChain
+
+Components:
+- OpenAI embeddings (text-embedding-ada-002)
+- FAISS vector store for document retrieval
+- GPT-3.5-turbo as LLM
+- Customizable prompt template
+
+Usage:
+- Change model_name to switch LLM (e.g., gpt-4)
+- Adjust temperature (0-1) for response creativity
+- Modify prompt template for different response formats
+
+4. app.py - FastAPI Application
+------------------------------
+Purpose: Provides API endpoints for chatbot
+
+Endpoints:
+- POST /chat
+  Request format: {"question": "Your question here"}
+  Response format: {"answer": "Generated response"}
+
+Usage:
+- Start server: uvicorn app:app --reload
+- Default URL: http://localhost:8000
+- Test with curl/Postman/Thunder Client
+
+5. Database Setup
+----------------
+Required PostgreSQL schema:
+
+CREATE TABLE documents (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255),
+  content TEXT,
+  metadata JSONB,
+  is_active BOOLEAN DEFAULT TRUE
+);
+
+Sample data:
+INSERT INTO documents (title, content, metadata)
+VALUES ('Product A', 'Description...', '{"category": "product"}');
+
+DEPLOYMENT INSTRUCTIONS
+-----------------------
+1. Install requirements:
+   pip install -r requirements.txt
+
+2. Configure .env file
+
+3. Set up PostgreSQL database:
+   - Create database and tables
+   - Insert sample documents
+
+4. Run the application:
+   uvicorn app:app --reload
+
+5. Test the API:
+   curl -X POST http://localhost:8000/chat \
+   -H "Content-Type: application/json" \
+   -d '{"question":"Your question"}'
+
+TROUBLESHOOTING
+---------------
+1. Connection issues:
+   - Verify PostgreSQL credentials
+   - Check if database is running
+
+2. API errors:
+   - Validate OpenAI API key
+   - Check document retrieval query
+
+3. Performance:
+   - For large datasets, consider:
+     - Using pgvector extension
+     - Implementing document chunking
+
+DEVELOPMENT NOTES
+-----------------
+- Add authentication for production use
+- Implement logging for debugging
+- Consider rate limiting for API endpoints
+- For large-scale deployment, use:
+  - ChromaDB/Weaviate instead of FAISS
+  - Async database connections
