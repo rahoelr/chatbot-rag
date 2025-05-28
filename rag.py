@@ -49,33 +49,39 @@ class DeepSeekRAG:
         )
     
     def _invoke_deepseek(self, prompt: str) -> str:
-        print("=== Prompt yang dikirim ke DeepSeek ===")
+        print("=== Prompt yang dikirim ke Gemini ===")
         print(prompt)
         prompt_str = prompt.to_string()
-        """Mengirim permintaan ke API DeepSeek"""
+        """Mengirim permintaan ke API Gemini"""
         headers = {
-            "Authorization": "Bearer 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",
             "Content-Type": "application/json"
         }
         
         payload = {
-            "model": "deepseek/deepseek-chat-v3-0324:free",
-            "messages": [{"role": "user", "content": prompt_str}],
-            "temperature": 0.7
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": prompt_str
+                        }
+                    ]
+                }
+            ]
         }
         
         try:
             response = requests.post(
-                "https://openrouter.ai/api/v1/chat/completions",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyARQmOSicjZONPlpVM0P6n0-S3N6f1J634",
                 headers=headers,
                 json=payload,
                 timeout=30
             )
             response.raise_for_status()
-            return response.json()['choices'][0]['message']['content']
+            return response.json()['candidates'][0]['content']['parts'][0]['text']
         except Exception as e:
-            return f"Error calling DeepSeek API: {str(e)}"
-    
+            return f"Error calling Gemini API: {str(e)}"
+
+            
     def query(self, question: str) -> str:
         """Antarmuka utama untuk query RAG"""
         return self.rag_chain.invoke(question)
