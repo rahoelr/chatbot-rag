@@ -11,7 +11,7 @@ from langchain_core.runnables import RunnableLambda
 from dotenv import load_dotenv
 
 
-class DeepSeekRAG:
+class GeminiRAG:
     def __init__(self):
         # Inisialisasi Embedding Model (DeepSeek belum menyediakan embedding resmi)
         self.embeddings = HuggingFaceBgeEmbeddings(
@@ -44,11 +44,11 @@ class DeepSeekRAG:
         self.rag_chain = (
             {"context": self.retriever, "question": RunnablePassthrough()}
             | self.prompt
-            | RunnableLambda(self._invoke_deepseek)
+            | RunnableLambda(self._invoke_gemini)
             | StrOutputParser()
         )
     
-    def _invoke_deepseek(self, prompt: str) -> str:
+    def _invoke_gemini(self, prompt: str) -> str:
         print("=== Prompt yang dikirim ke Gemini ===")
         print(prompt)
         prompt_str = prompt.to_string()
@@ -71,7 +71,7 @@ class DeepSeekRAG:
         
         try:
             response = requests.post(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyARQmOSicjZONPlpVM0P6n0-S3N6f1J634",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDXVqrq4Yd-vw4MCC--Qs6UNdckA9F1x_Y",
                 headers=headers,
                 json=payload,
                 timeout=30

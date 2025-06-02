@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from rag import DeepSeekRAG
+from rag import GeminiRAG
 import uvicorn
 
 app = FastAPI()
-rag_system = DeepSeekRAG()  
+rag_system = GeminiRAG()  
 
 class ChatRequest(BaseModel):
     question: str
